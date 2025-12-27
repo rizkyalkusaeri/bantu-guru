@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { GraduationCap, HelpCircle } from "lucide-react";
 import Link from "next/link";
+import { signIn } from "@/lib/auth";
 
 export default function LoginPage() {
     return (
@@ -32,11 +33,16 @@ export default function LoginPage() {
 
                 {/* Login Button */}
                 <div className="w-full pt-2">
-                    <Button
-                        className="w-full h-12 text-base font-bold bg-[#10b981] hover:bg-[#059669] text-white shadow-emerald-200 shadow-lg"
-                        asChild
+                    <form
+                        action={async () => {
+                            "use server"
+                            await signIn("google", { redirectTo: "/onboarding" })
+                        }}
                     >
-                        <Link href="/onboarding">
+                        <Button
+                            className="w-full h-12 text-base font-bold bg-[#10b981] hover:bg-[#059669] text-white shadow-emerald-200 shadow-lg"
+                            type="submit"
+                        >
                             <svg className="w-5 h-5 mr-3 bg-white rounded-full p-1" viewBox="0 0 24 24">
                                 <path
                                     d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -56,8 +62,8 @@ export default function LoginPage() {
                                 />
                             </svg>
                             Masuk dengan Google
-                        </Link>
-                    </Button>
+                        </Button>
+                    </form>
                 </div>
 
                 {/* Help Link */}

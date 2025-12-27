@@ -1,0 +1,99 @@
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
+}
+
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?  @db.Text
+  access_token       String?  @db.Text
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?  @db.Text
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// --- MASTER DATA ---
+
+model Jenjang {
+  id            String          @id @default(cuid())
+  label         String          // SD, SMP, SMA
+  kelas         Kelas[]
+  mataPelajaran MataPelajaran[]
+}
+
+model Fase {
+  id          String  @id @default(cuid())
+  label       String  // Fase A, Fase B
+  description String? // "Kelas 1-2 SD"
+  kelas       Kelas[]
+}
+
+model Kelas {
+  id        String  @id @default(cuid())
+  label     String  // Kelas 1, Kelas 2
+  tingkatan Int     // 1, 2 (for sorting)
+  
+  jenjang   Jenjang @relation(fields: [jenjangId], references: [id])
+  jenjangId String
+  
+  fase      Fase    @relation(fields: [faseId], references: [id])
+  faseId    String
+}
+
+model MataPelajaran {
+  id        String    @id @default(cuid())
+  label     String    // Matematika, Bahasa Indonesia
+  jenjang   Jenjang[]
+}
+
+model ModelPembelajaran {
+  id          String  @id @default(cuid())
+  label       String  // Problem Based Learning
+  description String?
+}
+
+model GayaBelajar {
+  id          String  @id @default(cuid())
+  label       String  // Visual
+  description String?
+}
